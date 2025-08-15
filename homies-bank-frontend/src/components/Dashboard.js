@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Navbar from "./Navbar";
-import Transactions from "./Transactions"; // your existing Transactions component
+import Transactions from "./Transactions";
+import Balances from "./Balance";
+// new component for balance
 
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -9,9 +11,11 @@ export default function Dashboard() {
   const renderTabContent = () => {
     switch (activeTab) {
       case "addTransaction":
-        return <Transactions />; // render transaction form
+        return <Transactions showMatrixOnly={false} />;
       case "oweMatrix":
-        return <Transactions showMatrixOnly />; // render only owe matrix
+        return <Transactions showMatrixOnly={true} />;
+      case "balances":
+        return <Balances/>;
       default:
         return null;
     }
@@ -50,6 +54,16 @@ export default function Dashboard() {
                 onClick={() => setActiveTab("oweMatrix")}
               >
                 Owe Matrix
+              </button>
+            </li>
+            <li className="nav-item">
+              <button
+                className={`nav-link ${
+                  activeTab === "balances" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("balances")}
+              >
+                Balances
               </button>
             </li>
           </ul>

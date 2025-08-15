@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -10,15 +11,14 @@ export default function Transactions({ showMatrixOnly }) {
   const [amount, setAmount] = useState("");
   const [oweMatrix, setOweMatrix] = useState([]);
 
-  // Fetch all users
   useEffect(() => {
     axios
       .get("http://localhost:8080/api/users")
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
 
-    fetchOweMatrix();
-  }, []);
+    if (showMatrixOnly) fetchOweMatrix(); // fetch only if matrix tab
+  }, [showMatrixOnly]);
 
   const fetchOweMatrix = () => {
     axios
@@ -56,7 +56,7 @@ export default function Transactions({ showMatrixOnly }) {
       setDescription("");
       setDate("");
       setAmount("");
-      fetchOweMatrix(); // Refresh matrix
+      fetchOweMatrix(); // Refresh matrix after adding
     } catch (err) {
       console.error(err);
       alert("Error adding transaction");
@@ -65,7 +65,7 @@ export default function Transactions({ showMatrixOnly }) {
 
   return (
     <div className="container mt-4">
-      <h2>Add Transaction</h2>
+      {/* Render form only if NOT showing matrix */}
       {!showMatrixOnly && (
         <form
           onSubmit={handleSubmit}
@@ -156,43 +156,45 @@ export default function Transactions({ showMatrixOnly }) {
           </button>
         </form>
       )}
-      {/* Owe Matrix Table */}
-      {/* Owe Matrix Table */}
-      {/* Owe Matrix Table */}
-      <h3>Owe Matrix</h3>
-      <div className="table-responsive">
-        <table className="table table-bordered table-striped">
-          <thead className="table-dark">
-            <tr>
-              <th>From User</th>
-              <th>To User</th>
-              <th>Amount</th>
-              <th>Description</th> {/* new column */}
-              <th>Date</th> {/* new column */}
-            </tr>
-          </thead>
-          <tbody>
-            {oweMatrix.length > 0 ? (
-              oweMatrix.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{row.fromUser}</td>
-                  <td>{row.toUser}</td>
-                  <td>₹{parseFloat(row.amount).toFixed(2)}</td>
-                  <td>{row.description}</td>
-                  <td>{new Date(row.date).toLocaleDateString()}</td>{" "}
-                  {/* format date */}
+
+      {/* Render matrix only if matrix tab is active */}
+      {showMatrixOnly && (
+        <>
+          <h3>Owe Matrix</h3>
+          <div className="table-responsive">
+            <table className="table table-bordered table-striped">
+              <thead className="table-dark">
+                <tr>
+                  <th>From User</th>
+                  <th>To User</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                  <th>Date</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center">
-                  No debts yet
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {oweMatrix.length > 0 ? (
+                  oweMatrix.map((row, idx) => (
+                    <tr key={idx}>
+                      <td>{row.fromUser}</td>
+                      <td>{row.toUser}</td>
+                      <td>₹{parseFloat(row.amount).toFixed(2)}</td>
+                      <td>{row.description}</td>
+                      <td>{new Date(row.date).toLocaleDateString()}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      No debts yet
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }

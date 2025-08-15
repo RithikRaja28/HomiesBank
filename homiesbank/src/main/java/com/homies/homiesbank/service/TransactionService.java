@@ -38,6 +38,21 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
+    public void settleOwe(String fromUser, String toUser) {
+        List<Transaction> transactions = transactionRepository.findAll();
+
+        for (Transaction tx : transactions) {
+            if (tx.getPayees() == null) continue;
+
+            // Remove the debt for this pair
+            tx.setPayees(tx.getPayees().stream()
+                    .filter(p -> !(p.getUsername().equals(fromUser) && tx.getPayer().equals(toUser)))
+                    .collect(Collectors.toList()));
+
+            transactionRepository.save(tx);
+        }
+    }
+
 
     // ✅ Fetch all transactions
     public List<Transaction> getAllTransactions() {

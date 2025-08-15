@@ -19,4 +19,6 @@ public class OweMatrixController {
     public Map<String, Map<String, Double>> getOweMatrix() {
         return (Map<String, Map<String, Double>>) oweMatrixService.calculateOweMatrix();
     }
+
+
 }
