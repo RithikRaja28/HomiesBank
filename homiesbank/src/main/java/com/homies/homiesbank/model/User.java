@@ -4,7 +4,6 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 @Document(collection = "users")
 @Data
 @NoArgsConstructor
@@ -16,4 +15,5 @@ public class User {
     private String username;
     private String password;
     private String role;
+    private double balance; // New field for deposits/available balance
 }

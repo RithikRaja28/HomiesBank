@@ -1,36 +1,33 @@
 package com.homies.homiesbank.controller;
 
 import com.homies.homiesbank.model.User;
-import com.homies.homiesbank.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.homies.homiesbank.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "*")
 public class UserController {
+    private final UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    // Signup
-    @PostMapping("/signup")
-    public String signup(@RequestBody User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return "User already exists!";
-        }
-        userRepository.save(user);
-        return "Signup successful!";
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    // Login
+    @PostMapping("/signup")
+    public User signup(@RequestBody User user) {
+        return userService.register(user.getUsername(), user.getPassword(), user.getRole());
+    }
+
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
-        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
-        if (existingUser.isPresent() && existingUser.get().getPassword().equals(user.getPassword())) {
-            return "Login successful! Role: " + existingUser.get().getRole();
-        }
-        return "Invalid username or password!";
+    public User login(@RequestBody User user) {
+        return userService.login(user.getUsername(), user.getPassword());
+    }
+
+    @GetMapping
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 }

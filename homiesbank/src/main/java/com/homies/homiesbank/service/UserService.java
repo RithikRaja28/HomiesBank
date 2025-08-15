@@ -1,13 +1,11 @@
 package com.homies.homiesbank.service;
 
-
 import com.homies.homiesbank.model.User;
 import com.homies.homiesbank.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -15,8 +13,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public UserService(UserRepository userRepository)
-    {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -24,19 +21,30 @@ public class UserService {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("User already exists");
         }
+
+        String finalRole = "ADMIN".equalsIgnoreCase(role) ? "ADMIN" : "HOUSEMATE";
+
         User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
-                .role(role)
+                .role(finalRole)
+                .balance(0)
                 .build();
+
         return userRepository.save(user);
     }
 
     public User login(String username, String password) {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
-            return userOpt.get();
+            User loggedInUser = userOpt.get();
+            loggedInUser.setPassword(null);
+            return loggedInUser;
         }
         throw new RuntimeException("Invalid username or password");
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }
