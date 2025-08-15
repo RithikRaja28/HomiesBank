@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -17,7 +16,7 @@ export default function Transactions({ showMatrixOnly }) {
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
 
-    if (showMatrixOnly) fetchOweMatrix(); // fetch only if matrix tab
+    if (showMatrixOnly) fetchOweMatrix();
   }, [showMatrixOnly]);
 
   const fetchOweMatrix = () => {
@@ -29,7 +28,6 @@ export default function Transactions({ showMatrixOnly }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!payer || !amount || payees.length === 0) {
       alert("Please fill all required fields");
       return;
@@ -56,7 +54,7 @@ export default function Transactions({ showMatrixOnly }) {
       setDescription("");
       setDate("");
       setAmount("");
-      fetchOweMatrix(); // Refresh matrix after adding
+      fetchOweMatrix();
     } catch (err) {
       console.error(err);
       alert("Error adding transaction");
@@ -64,105 +62,101 @@ export default function Transactions({ showMatrixOnly }) {
   };
 
   return (
-    <div className="container mt-4">
-      {/* Render form only if NOT showing matrix */}
+    <div className="container my-4">
       {!showMatrixOnly && (
-        <form
-          onSubmit={handleSubmit}
-          className="p-3 border rounded bg-light mb-4"
-        >
-          {/* Date */}
-          <div className="mb-3">
-            <label className="form-label">Date</label>
-            <input
-              type="date"
-              className="form-control"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            />
-          </div>
+        <div className="card shadow-sm p-4 mb-4">
+          <h4 className="mb-3 text-primary">Add Transaction</h4>
+          <form onSubmit={handleSubmit}>
+            <div className="row g-3">
+              <div className="col-md-4">
+                <label className="form-label">Date</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  required
+                />
+              </div>
 
-          {/* Description */}
-          <div className="mb-3">
-            <label className="form-label">Description</label>
-            <input
-              type="text"
-              className="form-control"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-          </div>
+              <div className="col-md-4">
+                <label className="form-label">Total Amount</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
+                />
+              </div>
 
-          {/* Payer */}
-          <div className="mb-3">
-            <label className="form-label">Payer</label>
-            <select
-              className="form-select"
-              value={payer}
-              onChange={(e) => setPayer(e.target.value)}
-              required
-            >
-              <option value="">-- Select Payer --</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.username}>
-                  {user.username}
-                </option>
-              ))}
-            </select>
-          </div>
+              <div className="col-md-4">
+                <label className="form-label">Payer</label>
+                <select
+                  className="form-select"
+                  value={payer}
+                  onChange={(e) => setPayer(e.target.value)}
+                  required
+                >
+                  <option value="">-- Select Payer --</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.username}>
+                      {user.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* Total Amount */}
-          <div className="mb-3">
-            <label className="form-label">Total Amount</label>
-            <input
-              type="number"
-              className="form-control"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-            />
-          </div>
+              <div className="col-12">
+                <label className="form-label">Description</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                />
+              </div>
 
-          {/* Payees */}
-          <div className="mb-3">
-            <label className="form-label">Payees (who owe money)</label>
-            <select
-              multiple
-              className="form-select"
-              value={payees}
-              onChange={(e) =>
-                setPayees([...e.target.selectedOptions].map((o) => o.value))
-              }
-              required
-            >
-              {users
-                .filter((user) => user.username !== payer)
-                .map((user) => (
-                  <option key={user.id} value={user.username}>
-                    {user.username}
-                  </option>
-                ))}
-            </select>
-            <small className="text-muted">
-              Hold Ctrl (Windows) or Cmd (Mac) to select multiple
-            </small>
-          </div>
+              <div className="col-12">
+                <label className="form-label">Payees (who owe money)</label>
+                <select
+                  multiple
+                  className="form-select"
+                  value={payees}
+                  onChange={(e) =>
+                    setPayees([...e.target.selectedOptions].map((o) => o.value))
+                  }
+                  required
+                >
+                  {users
+                    .filter((user) => user.username !== payer)
+                    .map((user) => (
+                      <option key={user.id} value={user.username}>
+                        {user.username}
+                      </option>
+                    ))}
+                </select>
+                <small className="text-muted">
+                  Hold Ctrl (Windows) or Cmd (Mac) to select multiple
+                </small>
+              </div>
 
-          {/* Submit */}
-          <button type="submit" className="btn btn-primary">
-            Add Transaction
-          </button>
-        </form>
+              <div className="col-12 text-end">
+                <button type="submit" className="btn btn-primary shadow-sm">
+                  Add Transaction
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       )}
 
-      {/* Render matrix only if matrix tab is active */}
       {showMatrixOnly && (
-        <>
-          <h3>Owe Matrix</h3>
+        <div className="card shadow-sm p-3">
+          <h4 className="mb-3 text-primary">Owe Matrix</h4>
           <div className="table-responsive">
-            <table className="table table-bordered table-striped">
+            <table className="table table-striped table-hover align-middle">
               <thead className="table-dark">
                 <tr>
                   <th>From User</th>
@@ -185,7 +179,7 @@ export default function Transactions({ showMatrixOnly }) {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center">
+                    <td colSpan="5" className="text-center text-muted">
                       No debts yet
                     </td>
                   </tr>
@@ -193,7 +187,7 @@ export default function Transactions({ showMatrixOnly }) {
               </tbody>
             </table>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

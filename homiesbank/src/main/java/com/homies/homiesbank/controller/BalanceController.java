@@ -2,6 +2,8 @@ package com.homies.homiesbank.controller;
 
 import com.homies.homiesbank.model.Balance;
 import com.homies.homiesbank.service.BalanceService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +22,21 @@ public class BalanceController {
     public List<Balance> getAllBalances() {
         return balanceService.getAllBalances();
     }
+
+
+    @PostMapping("/add")
+    public ResponseEntity<?> addBalance(
+            @RequestParam String username,
+            @RequestParam double amount) {
+
+        try {
+            balanceService.addBalance(username, amount);
+            return ResponseEntity.ok("Balance added successfully!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 
     @PostMapping("/pay-debt")
     public String payDebt(@RequestParam String username) {

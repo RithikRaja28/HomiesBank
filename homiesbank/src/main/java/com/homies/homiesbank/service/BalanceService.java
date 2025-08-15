@@ -30,6 +30,19 @@ public class BalanceService {
         return balanceRepository.findAll();
     }
 
+    // Add balance to a user
+    public void addBalance(String username, double amount) {
+        Balance balance = balanceRepository.findByUsername(username);
+        if (balance == null) {
+            throw new RuntimeException("User balance not found");
+        }
+
+        balance.setAmount(balance.getAmount() + amount);
+        balanceRepository.save(balance);
+        System.out.println("New balance for " + username + ": " + balance.getAmount());
+    }
+
+
     // Pay all debts for a user
     public void payDebts(String username) {
         Balance balance = balanceRepository.findByUsername(username);

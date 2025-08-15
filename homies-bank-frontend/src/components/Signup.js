@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { FaUserAlt, FaLock, FaUserTag } from "react-icons/fa";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -24,57 +25,112 @@ export default function Signup() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
+    <div
+      className="d-flex justify-content-center align-items-center vh-100"
+      style={{ backgroundColor: "#f8f9fa" }}
+    >
       <div
-        className="card shadow-lg p-4"
-        style={{ maxWidth: "400px", width: "100%" }}
+        className="card shadow-lg rounded-4 p-5"
+        style={{
+          maxWidth: "400px",
+          width: "100%",
+          border: "none",
+          backgroundColor: "#fff",
+        }}
       >
-        <h3 className="text-center mb-4">Create Account</h3>
+        <h2 className="text-center text-dark mb-3 fw-bold">Create Account</h2>
+        <p className="text-center text-muted mb-4">
+          Fill in your details to sign up
+        </p>
+
         <form onSubmit={handleSignup}>
-          <div className="mb-3">
-            <label className="form-label">Username</label>
+          <div className="mb-3 position-relative">
+            <FaUserAlt
+              className="position-absolute"
+              style={{
+                top: "50%",
+                left: "12px",
+                transform: "translateY(-50%)",
+                color: "#adb5bd",
+              }}
+            />
             <input
               type="text"
-              className="form-control"
+              className="form-control ps-5 rounded-pill"
+              placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              style={{ height: "45px", border: "1.5px solid #dee2e6" }}
             />
           </div>
-          <div className="mb-3">
-            <label className="form-label">Password</label>
+
+          <div className="mb-3 position-relative">
+            <FaLock
+              className="position-absolute"
+              style={{
+                top: "50%",
+                left: "12px",
+                transform: "translateY(-50%)",
+                color: "#adb5bd",
+              }}
+            />
             <input
               type="password"
-              className="form-control"
+              className="form-control ps-5 rounded-pill"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              style={{ height: "45px", border: "1.5px solid #dee2e6" }}
             />
           </div>
-          <div className="mb-3">
-            <label className="form-label">Role</label>
+
+          <div className="mb-3 position-relative">
+            <FaUserTag
+              className="position-absolute"
+              style={{
+                top: "50%",
+                left: "12px",
+                transform: "translateY(-50%)",
+                color: "#adb5bd",
+              }}
+            />
             <select
-              className="form-control"
+              className="form-control ps-5 rounded-pill"
               value={role}
               onChange={(e) => setRole(e.target.value)}
+              style={{ height: "45px", border: "1.5px solid #dee2e6" }}
             >
               <option value="ADMIN">ADMIN</option>
               <option value="HOUSEMATE">HOUSEMATE</option>
             </select>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
+          <button
+            type="submit"
+            className="btn w-100 rounded-pill fw-bold"
+            style={{
+              height: "45px",
+              fontSize: "16px",
+              background: "linear-gradient(90deg, #667eea, #764ba2)",
+              border: "none",
+              color: "#fff",
+            }}
+          >
             Sign Up
           </button>
         </form>
 
-        {/* Navigation to Login */}
-        <p className="mt-3 text-center">
-          Already have an account?{" "}
-          <Link to="/login" className="text-decoration-none">
+        <div className="mt-4 text-center">
+          <span className="text-muted">Already have an account? </span>
+          <Link
+            to="/login"
+            className="text-primary fw-bold text-decoration-none"
+          >
             Login here
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );

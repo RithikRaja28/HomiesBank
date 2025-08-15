@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Navbar from "./Navbar";
 import Transactions from "./Transactions";
 import Balances from "./Balance";
-// new component for balance
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -15,7 +15,7 @@ export default function Dashboard() {
       case "oweMatrix":
         return <Transactions showMatrixOnly={true} />;
       case "balances":
-        return <Balances/>;
+        return <Balances />;
       default:
         return null;
     }
@@ -24,43 +24,57 @@ export default function Dashboard() {
   return (
     <>
       <Navbar />
-      <div className="container mt-5">
-        <div className="card shadow p-4">
-          <h2 className="mb-4">Welcome, {user?.username} 🎉</h2>
-          <p>
+
+      <div className="container my-5">
+        {/* Welcome Card */}
+        <div
+          className="card shadow-lg rounded-4 p-4 mb-4 border-0 text-center"
+          style={{
+            background: "linear-gradient(135deg, #f8f9fa, #e9ecef)",
+          }}
+        >
+          <h2 className="mb-2 text-primary">Welcome, {user?.username} 🎉</h2>
+          <p className="mb-1">
             <strong>Role:</strong> {user?.role}
           </p>
-          <p>
-            <strong>User ID:</strong> {user?.id}
-          </p>
+        </div>
 
-          {/* Tabs */}
-          <ul className="nav nav-tabs mt-4">
-            <li className="nav-item">
+        {/* Dashboard Card */}
+        <div className="card shadow rounded-4 border-0">
+          {/* Modern Tabs */}
+          <ul className="nav nav-pills nav-fill bg-light rounded-top p-2 flex-wrap">
+            <li className="nav-item mb-2 mb-md-0">
               <button
                 className={`nav-link ${
-                  activeTab === "addTransaction" ? "active" : ""
-                }`}
+                  activeTab === "addTransaction"
+                    ? "active bg-primary text-white"
+                    : "text-primary"
+                } rounded-pill`}
                 onClick={() => setActiveTab("addTransaction")}
+                disabled={user?.role !== "ADMIN"} // only admin can add transactions
               >
                 Add Transaction
               </button>
             </li>
-            <li className="nav-item">
+            <li className="nav-item mb-2 mb-md-0">
               <button
                 className={`nav-link ${
-                  activeTab === "oweMatrix" ? "active" : ""
-                }`}
+                  activeTab === "oweMatrix"
+                    ? "active bg-primary text-white"
+                    : "text-primary"
+                } rounded-pill`}
                 onClick={() => setActiveTab("oweMatrix")}
               >
                 Owe Matrix
               </button>
             </li>
-            <li className="nav-item">
+            <li className="nav-item mb-2 mb-md-0">
               <button
                 className={`nav-link ${
-                  activeTab === "balances" ? "active" : ""
-                }`}
+                  activeTab === "balances"
+                    ? "active bg-primary text-white"
+                    : "text-primary"
+                } rounded-pill`}
                 onClick={() => setActiveTab("balances")}
               >
                 Balances
@@ -68,8 +82,20 @@ export default function Dashboard() {
             </li>
           </ul>
 
-          {/* Tab Content */}
-          <div className="mt-4">{renderTabContent()}</div>
+          {/* Tab Content with Smooth Transition */}
+          <div className="p-4">
+            <AnimatePresence exitBeforeEnter>
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {renderTabContent()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </>

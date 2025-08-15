@@ -35,14 +35,25 @@ public class UserService {
     }
 
     public User login(String username, String password) {
+        System.out.println("Attempting login for user: " + username);
         Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
-            User loggedInUser = userOpt.get();
-            loggedInUser.setPassword(null);
-            return loggedInUser;
+        if (!userOpt.isPresent()) {
+            System.out.println("User not found!");
+            throw new RuntimeException("Invalid username or password");
         }
-        throw new RuntimeException("Invalid username or password");
+
+        User user = userOpt.get();
+        System.out.println("Stored password: " + user.getPassword());
+
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            user.setPassword(null);
+            return user;
+        } else {
+            System.out.println("Password mismatch!");
+            throw new RuntimeException("Invalid username or password");
+        }
     }
+
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
