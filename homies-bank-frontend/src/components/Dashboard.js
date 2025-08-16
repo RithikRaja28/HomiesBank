@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
-  const [activeTab, setActiveTab] = useState("addTransaction"); // default tab
+  const [activeTab, setActiveTab] = useState("oweMatrix"); // default tab
 
   const renderTabContent = () => {
     switch (activeTab) {
