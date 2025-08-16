@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const API_URL = process.env.REACT_APP_API_URL;
+
 
 export default function Balances() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -12,7 +14,7 @@ export default function Balances() {
 
   const fetchBalances = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/balances");
+      const res = await axios.get(`${API_URL}/api/balances`);
       setBalances(res.data);
     } catch (err) {
       console.error(err);
@@ -21,7 +23,7 @@ export default function Balances() {
 
   const fetchAllUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/users");
+      const res = await axios.get(`${API_URL}/api/users`);
       setAllUsers(res.data);
     } catch (err) {
       console.error(err);
@@ -37,7 +39,7 @@ export default function Balances() {
     setLoadingUser(username);
     try {
       await axios.post(
-        `http://localhost:8080/api/balances/pay-debt?username=${username}`
+        `${API_URL}/api/balances/pay-debt?username=${username}`
       );
       fetchBalances();
       alert(`${username}'s debts paid successfully!`);
@@ -51,7 +53,7 @@ export default function Balances() {
   const handleAddBalance = async () => {
     try {
       await axios.post(
-        `http://localhost:8080/api/balances/add?username=${selectedUser}&amount=${parseFloat(
+        `${API_URL}/api/balances/add?username=${selectedUser}&amount=${parseFloat(
           amountToAdd
         )}`
       );

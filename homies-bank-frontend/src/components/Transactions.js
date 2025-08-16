@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const API_URL = process.env.REACT_APP_API_URL;
+
 
 export default function Transactions({ showMatrixOnly }) {
   const [users, setUsers] = useState([]);
@@ -12,7 +14,7 @@ export default function Transactions({ showMatrixOnly }) {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/users")
+      .get(`${API_URL}/api/users`)
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
 
@@ -21,7 +23,7 @@ export default function Transactions({ showMatrixOnly }) {
 
   const fetchOweMatrix = () => {
     axios
-      .get("http://localhost:8080/api/transactions/owe-matrix")
+      .get(`${API_URL}/api/transactions/owe-matrix`)
       .then((res) => setOweMatrix(res.data))
       .catch((err) => console.error(err));
   };
@@ -47,7 +49,7 @@ export default function Transactions({ showMatrixOnly }) {
     };
 
     try {
-      await axios.post("http://localhost:8080/api/transactions", transaction);
+      await axios.post(`${API_URL}/api/transactions`, transaction);
       alert("Transaction added!");
       setPayer("");
       setPayees([]);

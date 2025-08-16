@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FaUserAlt, FaLock, FaUserTag } from "react-icons/fa";
+const API_URL = process.env.REACT_APP_API_URL;
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -12,7 +13,7 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/api/users/signup", {
+      await axios.post(`${API_URL}/api/users/signup`, {
         username,
         password,
         role,
