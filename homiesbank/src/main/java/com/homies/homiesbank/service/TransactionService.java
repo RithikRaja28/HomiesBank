@@ -23,7 +23,7 @@ public class TransactionService {
             throw new RuntimeException("Payees list cannot be empty");
         }
 
-        double splitAmount = transaction.getTotalAmount() / transaction.getPayees().size()+1;
+        double splitAmount = transaction.getTotalAmount() / (transaction.getPayees().size() + 1);
 
         List<Transaction.PayeeInfo> updatedPayees = transaction.getPayees().stream()
                 .map(p -> Transaction.PayeeInfo.builder()

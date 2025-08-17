@@ -50,6 +50,33 @@
             transactionRepository.saveAll(transactions);
         }
 
+        public void updateOweEntry(String debtor, String payer, double amountPaid) {
+            List<Transaction> transactions = transactionRepository.findAll();
+
+            for (Transaction tx : transactions) {
+                if (!tx.getPayer().equals(payer)) continue;
+                if (tx.getPayees() == null) continue;
+
+                for (Transaction.PayeeInfo payee : tx.getPayees()) {
+                    if (payee.getUsername().equals(debtor)) {
+                        double newAmount = payee.getAmountOwed() - amountPaid;
+
+                        if (newAmount <= 0) {
+                            // fully paid -> remove this payee from transaction
+                            tx.getPayees().remove(payee);
+                        } else {
+                            // partially paid -> update amount
+                            payee.setAmountOwed(newAmount);
+                        }
+
+                        transactionRepository.save(tx);
+                        return; // stop after first match
+                    }
+                }
+            }
+        }
+
+
 
 
 

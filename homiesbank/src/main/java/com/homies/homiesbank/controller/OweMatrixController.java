@@ -20,5 +20,13 @@ public class OweMatrixController {
         return (Map<String, Map<String, Double>>) oweMatrixService.calculateOweMatrix();
     }
 
+    @PutMapping("/update")
+    public void updateOweEntry(@RequestParam String debtor,
+                               @RequestParam String payer,
+                               @RequestParam double amountPaid) {
+        oweMatrixService.updateOweEntry(debtor, payer, amountPaid);
+    }
+
+
 
 }

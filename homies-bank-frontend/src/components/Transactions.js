@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 const API_URL = process.env.REACT_APP_API_URL;
 
-
 export default function Transactions({ showMatrixOnly }) {
   const [users, setUsers] = useState([]);
   const [payer, setPayer] = useState("");
@@ -11,6 +10,11 @@ export default function Transactions({ showMatrixOnly }) {
   const [date, setDate] = useState("");
   const [amount, setAmount] = useState("");
   const [oweMatrix, setOweMatrix] = useState([]);
+
+  // Modal states
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [amountPaid, setAmountPaid] = useState("");
 
   useEffect(() => {
     axios
@@ -60,6 +64,30 @@ export default function Transactions({ showMatrixOnly }) {
     } catch (err) {
       console.error(err);
       alert("Error adding transaction");
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!selectedRecord || !amountPaid) {
+      alert("Please enter amount");
+      return;
+    }
+
+    try {
+      await axios.put(`${API_URL}/api/owe/update`, null, {
+        params: {
+          debtor: selectedRecord.fromUser,
+          payer: selectedRecord.toUser,
+          amountPaid: amountPaid,
+        },
+      });
+      alert("Owe record updated!");
+      setShowUpdateModal(false);
+      setAmountPaid("");
+      fetchOweMatrix();
+    } catch (err) {
+      console.error(err);
+      alert("Error updating record");
     }
   };
 
@@ -166,6 +194,7 @@ export default function Transactions({ showMatrixOnly }) {
                   <th>Amount</th>
                   <th>Description</th>
                   <th>Date</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -177,17 +206,79 @@ export default function Transactions({ showMatrixOnly }) {
                       <td>₹{parseFloat(row.amount).toFixed(2)}</td>
                       <td>{row.description}</td>
                       <td>{new Date(row.date).toLocaleDateString()}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-warning"
+                          onClick={() => {
+                            setSelectedRecord(row);
+                            setShowUpdateModal(true);
+                          }}
+                        >
+                          Update
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center text-muted">
+                    <td colSpan="6" className="text-center text-muted">
                       No debts yet
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Update Modal */}
+      {showUpdateModal && (
+        <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Update Owe Record</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowUpdateModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p>
+                  <strong>{selectedRecord.fromUser}</strong> owes{" "}
+                  <strong>{selectedRecord.toUser}</strong>
+                </p>
+                <p>
+                  Current Amount: ₹
+                  {parseFloat(selectedRecord.amount).toFixed(2)}
+                </p>
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="Enter amount paid"
+                  value={amountPaid}
+                  onChange={(e) => setAmountPaid(e.target.value)}
+                />
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowUpdateModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleUpdate}
+                >
+                  Update
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

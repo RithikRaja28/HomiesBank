@@ -44,31 +44,50 @@ public class BalanceService {
 
 
     // Pay all debts for a user
+    // Pay all debts for a user
     public void payDebts(String username) {
-        Balance balance = balanceRepository.findByUsername(username);
-        if (balance == null) return;
+        Balance debtorBalance = balanceRepository.findByUsername(username);
+        if (debtorBalance == null) return;
 
         Map<String, Map<String, Double>> oweMatrix = transactionService.calculateOweMatrix();
         Map<String, Double> debts = oweMatrix.get(username);
         if (debts == null || debts.isEmpty()) return;
 
         double totalDebt = debts.values().stream().mapToDouble(Double::doubleValue).sum();
-        if (balance.getAmount() < totalDebt) {
+        if (debtorBalance.getAmount() < totalDebt) {
             throw new RuntimeException("Insufficient balance to settle debts");
         }
 
-        balance.setAmount(balance.getAmount() - totalDebt);
-        balanceRepository.save(balance);
-        System.out.println("New balance: " + balance.getAmount());
+        // Process each debt individually
+        for (Map.Entry<String, Double> entry : debts.entrySet()) {
+            String creditor = entry.getKey();
+            double amount = entry.getValue();
 
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        System.out.println("Paying debts for: " + username);
-        for (Transaction tx : transactions) {
-            if (tx.getPayees() == null) continue;
-            if (tx.getPayees().removeIf(payee -> payee.getUsername().equals(username))) {
-                transactionRepository.save(tx);
+            // Deduct from debtor
+            debtorBalance.setAmount(debtorBalance.getAmount() - amount);
+
+            // Add to creditor
+            Balance creditorBalance = balanceRepository.findByUsername(creditor);
+            if (creditorBalance != null) {
+                creditorBalance.setAmount(creditorBalance.getAmount() + amount);
+                balanceRepository.save(creditorBalance);
             }
+
+            // Remove this debt from transactions
+            List<Transaction> transactions = transactionService.getAllTransactions();
+            for (Transaction tx : transactions) {
+                if (tx.getPayer().equals(creditor) && tx.getPayees() != null) {
+                    tx.getPayees().removeIf(p -> p.getUsername().equals(username));
+                    transactionRepository.save(tx);
+                }
+            }
+
+            System.out.println(username + " paid " + amount + " to " + creditor);
         }
+
+        balanceRepository.save(debtorBalance);
+        System.out.println("New balance for " + username + ": " + debtorBalance.getAmount());
     }
+
 
 }
