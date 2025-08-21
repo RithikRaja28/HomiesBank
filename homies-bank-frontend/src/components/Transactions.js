@@ -16,13 +16,27 @@ export default function Transactions({ showMatrixOnly }) {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [amountPaid, setAmountPaid] = useState("");
 
+  // Current logged in user
+  const [currentUser, setCurrentUser] = useState(null);
+
   useEffect(() => {
+    // fetch users list
     axios
       .get(`${API_URL}/api/users`)
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
 
     if (showMatrixOnly) fetchOweMatrix();
+
+    // read logged in user from localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setCurrentUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Invalid user data in localStorage", err);
+      }
+    }
   }, [showMatrixOnly]);
 
   const fetchOweMatrix = () => {
@@ -207,15 +221,17 @@ export default function Transactions({ showMatrixOnly }) {
                       <td>{row.description}</td>
                       <td>{new Date(row.date).toLocaleDateString()}</td>
                       <td>
-                        <button
-                          className="btn btn-sm btn-warning"
-                          onClick={() => {
-                            setSelectedRecord(row);
-                            setShowUpdateModal(true);
-                          }}
-                        >
-                          Update
-                        </button>
+                        {currentUser?.role === "ADMIN" && (
+                          <button
+                            className="btn btn-sm btn-warning"
+                            onClick={() => {
+                              setSelectedRecord(row);
+                              setShowUpdateModal(true);
+                            }}
+                          >
+                            Update
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))
